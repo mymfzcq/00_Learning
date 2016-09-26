@@ -8,6 +8,7 @@ namespace ConsoleApplication4
 {
     public class Animals
     {
+        
         public Animals(string s)
         {
             Name = s;
