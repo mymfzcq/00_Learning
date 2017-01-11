@@ -1,0 +1,57 @@
+1.add PMU module to system and select optimization_speed.
+2.add PMU_MainTask
+   TASK PMU_MainTask {
+      Component = "PMU": "Attribute used for component management";
+      TYPE = EXTENDED;
+      SCHEDULE = NON;
+      PRIORITY = 10: "lower then GS_fast task";
+      ACTIVATION = 1;
+      TIMING_PROTECTION = FALSE;
+      AUTOSTART = FALSE;
+      EVENT = GOSW__osEv_GA_Rdy;
+      EVENT = EVHD_osEv_Dispatcher;
+      StackSize = 2048;
+      NotUsingSchedule = FALSE;
+      ConfigMemoryAreas = FALSE;
+   }: "PMU_MainTask handlles different sub-procedures";
+3.add PMU_1000ms TASK
+   TASK PMU_1000ms {
+      Component = "PMU": "Attribute used for component management";
+      TYPE = BASIC;
+      SCHEDULE = NON;
+      PRIORITY = 6: "lower then GS_fast task";
+      ACTIVATION = 2;
+      TIMING_PROTECTION = FALSE;
+      AUTOSTART = FALSE;
+      StackSize = 512;
+      NotUsingSchedule = FALSE;
+      ConfigMemoryAreas = FALSE;
+   }: "PMU_1000ms TASK";
+4.add 
+   ALARM PMU_1000msAlarm {
+      Component = "PMU": "Attribute used for component management";
+      COUNTER = SystemTimer;
+      ACTION = ACTIVATETASK
+      {
+         TASK = PMU_1000ms;
+      };
+      AUTOSTART = FALSE
+      {
+         StaticAlarm = FALSE;
+      };
+   }: "this alarm ID is used by PMU module";
+6.add
+   ISR PMU_TAUA0106_ISR {
+      Component = "PMU": "Attribute used for component management";
+      CATEGORY = 2;
+      TIMING_PROTECTION = FALSE;
+      EnableNesting = FALSE;
+      VectorAddress = 0x220;
+      InterruptLevel = 10;
+      InitializeLevel = TRUE;
+      ConfigMemoryAreas = FALSE;
+      UseSpecialFunctionName = FALSE;
+   }: "this timer interrupt is used by PMU uint";
+7.disable -nofloatio in build_option file.
+8.adapt HMICA.C and IDLE(note IDLE_nUseHaltCPU_Cfg is off)
+9.see if it is need to set GAD layer order.
